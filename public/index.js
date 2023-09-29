@@ -75,7 +75,27 @@ async function main() {
 
     });
     const averagePriceChartCanvas = document.querySelector('#average-price-chart');
+    new Chart(averagePriceChartCanvas.getContext('2d'), {
+        //define chart type to pie
+        type: 'pie',
+        // send payload of data referencing the mockStonks
+        data: {
+            //only need one data set to run through.
+            //created a mapped array of all the mockStonk symbols
+            labels: mockStonks.map(symbol => symbol.meta.symbol),
+            //maps the mockStonks to the aesthetic side of 
+            datasets: [{
+                //simplify our dataset to only have 4 values
+                label: 'Averages',
+                //uses our custom defined function to return the array of 4 highest values
+                data: returnAverageValues(mockStonks),
+                //aesthetic settings -- create a mapped array for colors
+                backgroundColor: mockStonks.map(stonk => getColor(stonk.meta.symbol)),
+                borderColor: mockStonks.map(stonk => getColor(stonk.meta.symbol)),
+            }]
+        }
 
+    });
 }
 
 function getHighestValues(stocks) {
@@ -92,7 +112,6 @@ function getHighestValues(stocks) {
         stock.values.forEach(value => {
             //if the value we itterate on is higher, set it as the new max
             if (parseFloat(value.high) > myStockMax) {
-                console.log(value.high)
                 myStockMax = parseFloat(value.high);
             }
             else {
@@ -103,8 +122,34 @@ function getHighestValues(stocks) {
         maxValues.push(myStockMax);
     });
     //returns the array of max values
-    console.log(maxValues)
     return maxValues;
+}
+
+/*ok, so I don't actually know if this is technically a moving average I am calculating
+    I am not really a finance guy, but I basically took each day's high and low,
+    took the average of those two values to find the "daily average", 
+    then divided the sum of those "daily averages" by the number of days tracked
+*/
+function returnAverageValues(stocks) {
+    //define an empty array to retun
+    let returnValues = []
+    stocks.forEach(stonk => {
+        let numValues = 0;
+        let runningDailyAverage = 0;
+        stonk.values.forEach(value => {
+            //increment our number of values
+            numValues++
+            //take the daily high and low and find the daily average 
+            runningDailyAverage += ((parseFloat(value.high) + parseFloat(value.high)) / 2);
+        })
+        //divide the sum of all daily averages by the number of total values
+        //add that value to our array
+        returnValues.push(runningDailyAverage / numValues);
+    })
+    // console.log(returnValues)
+
+    //finally, return those values
+    return returnValues;
 }
 
 function getColor(stock) {
