@@ -2,12 +2,12 @@
 
 async function main() {
     //define our key and sample websocket request
-    const key = "33a4210db8d04daf9e3ed5143978ee47"
+    const key = "33a4210db8d04daf9e3ed5143978ee47" // this should definitely not be public.
     const sampleURL = `https://api.twelvedata.com/time_series?symbol=GME,MSFT,DIS,BNTX&interval=1min&apikey=${key}`
     //run our async fetch requests
     const response = await fetch(sampleURL)
     const result = await response.json()
-    //console.log(results)
+    console.log(result)
 
     /*copied from assignent page
     let GME = result.GME
